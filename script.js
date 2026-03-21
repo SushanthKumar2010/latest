@@ -2643,6 +2643,27 @@ async function saveSnippetToSupabase(question, answer) {
   
   const { data: { session } } = await supabaseClient.auth.getSession();
   
+  // Get user profile for sharer info
+  let sharerName = "Anonymous";
+  let sharerAvatar = null;
+  let sharerClass = null;
+  let sharerBoard = null;
+  
+  if (session?.user?.id) {
+    const { data: profile } = await supabaseClient
+      .from("user_profiles")
+      .select("full_name, username, avatar_url, class_level, board")
+      .eq("id", session.user.id)
+      .single();
+    
+    if (profile) {
+      sharerName = profile.full_name || profile.username || "Student";
+      sharerAvatar = profile.avatar_url || null;
+      sharerClass = profile.class_level || null;
+      sharerBoard = profile.board || null;
+    }
+  }
+  
   // Generate a short unique ID
   const snippetId = generateSnippetId();
   
@@ -2651,6 +2672,10 @@ async function saveSnippetToSupabase(question, answer) {
     question: question,
     answer: answer,
     user_id: session?.user?.id || null,
+    sharer_name: sharerName,
+    sharer_avatar: sharerAvatar,
+    sharer_class: sharerClass,
+    sharer_board: sharerBoard,
     created_at: new Date().toISOString(),
   };
   
