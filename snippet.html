@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Shared Response | Teengro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .snippet-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .snippet-container {
+      max-width: 700px;
+      width: 100%;
+    }
+    
+    .snippet-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .snippet-logo {
+      height: 28px;
+      margin-bottom: 20px;
+    }
+    
+    .snippet-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+    
+    .snippet-card {
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    body[data-theme="dark"] .snippet-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+    body[data-theme="light"] .snippet-card {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+    }
+    
+    .snippet-question {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid;
+    }
+    body[data-theme="dark"] .snippet-question {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    body[data-theme="light"] .snippet-question {
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    
+    .snippet-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.4;
+      margin-bottom: 10px;
+    }
+    
+    .snippet-label-icon {
+      font-size: 0.9rem;
+    }
+    
+    .snippet-question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    
+    .snippet-answer-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    
+    .snippet-footer {
+      text-align: center;
+    }
+    
+    .snippet-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      background: #10b981;
+      color: #020617;
+    }
+    .snippet-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
+    }
+    
+    .snippet-meta {
+      font-size: 0.78rem;
+      opacity: 0.35;
+      margin-top: 16px;
+    }
+    
+    .snippet-loading,
+    .snippet-error {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .snippet-loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(128, 128, 128, 0.2);
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: snippetSpin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes snippetSpin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .snippet-error-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    .snippet-error-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .snippet-error-desc {
+      font-size: 0.9rem;
+      opacity: 0.5;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+<div class="snippet-page">
+  <div class="snippet-container">
+    
+    <!-- Header -->
+    <div class="snippet-header">
+      <a href="index.html">
+        <img src="logo-dark.png" class="snippet-logo logo-dark" alt="Teengro" />
+        <img src="logo-light.png" class="snippet-logo logo-light" alt="Teengro" />
+      </a>
+      <div class="snippet-title">Shared Response</div>
+    </div>
+    
+    <!-- Loading state -->
+    <div class="snippet-loading" id="snippetLoading">
+      <div class="snippet-loading-spinner"></div>
+      <div style="opacity: 0.5;">Loading snippet...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div class="snippet-error" id="snippetError" style="display: none;">
+      <div class="snippet-error-icon">🔗</div>
+      <div class="snippet-error-title">Snippet not found</div>
+      <div class="snippet-error-desc">This link may have expired or doesn't exist.</div>
+      <a href="index.html" class="snippet-cta">Go to Teengro</a>
+    </div>
+    
+    <!-- Content -->
+    <div id="snippetContent" style="display: none;">
+      <div class="snippet-card">
+        <div class="snippet-question">
+          <div class="snippet-label">
+            <span class="snippet-label-icon">❓</span>
+            Question
+          </div>
+          <div class="snippet-question-text" id="snippetQuestion"></div>
+        </div>
+        <div class="snippet-answer">
+          <div class="snippet-label">
+            <span class="snippet-label-icon">🤖</span>
+            AI Response
+          </div>
+          <div class="snippet-answer-text" id="snippetAnswer"></div>
+        </div>
+      </div>
+      
+      <div class="snippet-footer">
+        <a href="dashboard.html" class="snippet-cta">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Try Teengro AI Tutor
+        </a>
+        <div class="snippet-meta" id="snippetMeta"></div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+  // Theme setup
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.body.setAttribute("data-theme", savedTheme);
+  
+  // Logo visibility
+  document.querySelectorAll('.snippet-logo').forEach(logo => {
+    logo.style.display = 'none';
+  });
+  const themeLogo = savedTheme === 'dark' ? '.logo-dark' : '.logo-light';
+  document.querySelectorAll(themeLogo).forEach(logo => {
+    logo.style.display = 'block';
+  });
+  
+  // Supabase setup
+  const SUPABASE_URL = "https://ctquajydjitfjhqvezfz.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0cXVhanlkaml0ZmpocXZlemZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MjA1MzQsImV4cCI6MjA4MzE5NjUzNH0.3cenuqB4XffJdRQisJQhq7PS9_ybXDN7ExbsKfXx9gU";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+  // Get snippet ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const snippetId = urlParams.get('id');
+  
+  // Load snippet
+  async function loadSnippet() {
+    const loadingEl = document.getElementById('snippetLoading');
+    const errorEl = document.getElementById('snippetError');
+    const contentEl = document.getElementById('snippetContent');
+    
+    if (!snippetId) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabaseClient
+        .from('shared_snippets')
+        .select('*')
+        .eq('id', snippetId)
+        .single();
+      
+      if (error || !data) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        return;
+      }
+      
+      // Populate content
+      document.getElementById('snippetQuestion').textContent = data.question;
+      document.getElementById('snippetAnswer').textContent = data.answer;
+      
+      // Format date
+      const createdAt = new Date(data.created_at);
+      const dateStr = createdAt.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+      document.getElementById('snippetMeta').textContent = `Shared on ${dateStr}`;
+      
+      // Update page title
+      document.title = `${data.question.slice(0, 50)}... | Teengro`;
+      
+      // Show content
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      
+    } catch (err) {
+      console.error('Error loading snippet:', err);
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+    }
+  }
+  
+  loadSnippet();
+</script>
+
+</body>
+</html>

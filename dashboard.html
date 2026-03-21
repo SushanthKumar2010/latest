@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Dashboard | Teengro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .page-main { padding-top: 58px; }
+  </style>
+</head>
+
+<body class="about-body" data-theme="dark">
+
+<header class="navbar navbar-animate">
+  <div class="logo">
+    <img src="logo-dark.png"  class="logo-img logo-dark"  alt="Teengro" />
+    <img src="logo-light.png" class="logo-img logo-light" alt="Teengro" />
+  </div>
+  <div class="nav-right">
+    <div class="nav-tooltip-wrap" data-tooltip="Chat History">
+      <button class="history-nav-btn" id="historyBtn" aria-label="Chat History">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M3 14h7v7H3z"/><path d="M14 14h7v7h-7z"/></svg>
+      </button>
+    </div>
+    <div class="nav-tooltip-wrap" data-tooltip="New Chat">
+      <button class="new-chat-nav-btn" id="newChatBtn" aria-label="New Chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+    <button class="profile-trigger" id="profileTriggerNav" title="My Profile">?</button>
+    <button class="hamburger" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="index.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a href="about.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>About Us</a>
+    <a href="founder.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Meet the Founder</a>
+    <a href="help.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help</a>
+    <div class="menu-divider"></div>
+    <a href="profile.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>My Profile</a>
+    <div class="menu-divider"></div>
+    <button id="themeToggle"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Change theme</button>
+    <div class="menu-divider"></div>
+    <a href="login.html" id="navLoginLink"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Login</a>
+    <button id="navLogoutBtn" onclick="logout()" style="display:none;"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+  </div>
+</header>
+
+<main class="page-main">
+  <div class="ai-shell">
+    <section class="ai-controls animate-card-in">
+      <div class="ai-control">
+        <label>Class</label>
+        <select id="classLevel">
+          <option>8</option><option>9</option>
+          <option selected>10</option>
+          <option>11</option><option>12</option>
+        </select>
+      </div>
+      <div class="ai-control">
+        <label>Board</label>
+        <select id="board">
+          <option selected>ICSE</option>
+          <option>CBSE</option>
+          <option>SSLC</option>
+        </select>
+      </div>
+      <div class="ai-control">
+        <label>Subject</label>
+        <select id="subject">
+          <option value="Maths">Maths</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Biology">Biology</option>
+          <option value="English Literature">English Literature</option>
+          <option value="English Grammar">English Grammar</option>
+          <option value="History">History &amp; Civics / Economics</option>
+          <option value="Geography">Geography</option>
+          <option value="Computer Applications">Computer Applications</option>
+        </select>
+      </div>
+      <div class="ai-control">
+        <label>Chapter</label>
+        <input id="chapter" placeholder="e.g. Quadratic Equations" />
+      </div>
+    </section>
+
+    <section class="free-chat-shell">
+      <div id="chatWindow" class="free-chat-window">
+        <div class="chat-empty-state" id="chatEmptyState" aria-hidden="true">
+          <p class="chat-empty-greeting" id="chatEmptyGreeting"></p>
+          <div class="chat-empty-icon">💬</div>
+          <p class="chat-empty-title">Ask anything</p>
+          <p class="chat-empty-hint">Maths, Physics, Chemistry — get step-by-step explanations.</p>
+        </div>
+      </div>
+      <div class="free-input-wrapper">
+        <div id="modelDropdown" class="model-dropdown-panel">
+          <div class="mdp-header">Model</div>
+          <div class="mdp-option" data-model="t1">
+            <span class="mdp-icon">⚡</span>
+            <div class="mdp-info"><div class="mdp-name">T1 — Flash</div><div class="mdp-desc">Fast · Great for most questions</div></div>
+            <span class="mdp-check" id="checkT1">✓</span>
+          </div>
+          <div class="mdp-option" data-model="t2">
+            <span class="mdp-icon">🧠</span>
+            <div class="mdp-info"><div class="mdp-name">T2 — Pro</div><div class="mdp-desc">Powerful · For complex problems</div></div>
+            <span class="mdp-check" id="checkT2"></span>
+          </div>
+        </div>
+        <div id="uploadDropdown" class="upload-dropdown-panel">
+          <div class="upload-option" data-upload-type="file">
+            <svg class="upload-option-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <div class="upload-option-text">
+              <div class="upload-option-title">Upload PDF/Document</div>
+              <div class="upload-option-desc">Browse and upload files</div>
+            </div>
+          </div>
+          <div class="upload-option" data-upload-type="photo">
+            <svg class="upload-option-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <div class="upload-option-text">
+              <div class="upload-option-title">Upload Photo</div>
+              <div class="upload-option-desc">Select image from gallery</div>
+            </div>
+          </div>
+          <div class="upload-option" data-upload-type="camera">
+            <svg class="upload-option-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <div class="upload-option-text">
+              <div class="upload-option-title">Take Photo</div>
+              <div class="upload-option-desc">Use camera to capture</div>
+            </div>
+          </div>
+        </div>
+        <form id="questionForm" class="free-input-bar">
+          <div id="uploadChipsRow" class="upload-chips-row"></div>
+          <div class="input-textarea-row">
+            <textarea id="questionInput" placeholder="Ask anything…" rows="1"></textarea>
+          </div>
+          <div class="input-bottom-bar">
+            <div class="input-left-slot">
+              <button type="button" id="uploadBtn" class="tb-icon-btn" title="Attach file or image">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx" multiple style="display:none;" />
+              <input type="file" id="photoInput" accept="image/*" multiple style="display:none;" />
+              <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
+            </div>
+            <div class="input-actions-slot">
+              <button type="button" id="modelBtn" class="model-chip-btn" title="Choose model">
+                <span class="model-chip-icon">⚡</span>
+                <span id="modelPillLabel">T1 · Flash</span>
+                <svg class="model-chip-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button type="button" id="voiceBtn" class="tb-icon-btn" title="Voice input">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
+                  <path fill="none" stroke="currentColor" stroke-width="2" d="M19 10a7 7 0 0 1-14 0M12 19v4M8 23h8"/>
+                </svg>
+              </button>
+              <button type="submit" id="sendBtn" class="tb-send" title="Send">
+                <svg id="sendIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg id="stopIcon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+              </button>
+            </div>
+          </div>
+        </form>
+        <div class="session-indicator" id="sessionIndicator">Studying</div>
+        <div class="ai-disclaimer">
+          Teengro is AI and can make mistakes. Please double-check responses.
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

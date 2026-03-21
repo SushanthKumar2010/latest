@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teengro — You're Offline</title>
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Apply saved theme immediately before page renders — prevents flash
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── THEME VARIABLES ── */
+    :root[data-theme="dark"], html[data-theme="dark"] {
+      --bg:          #0a0f0f;
+      --text:        #f9fafb;
+      --subtext:     rgba(249,250,251,0.45);
+      --card-bg:     rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --btn-bg:      #ffffff;
+      --btn-text:    #000000;
+    }
+    :root[data-theme="light"], html[data-theme="light"] {
+      --bg:          #f9fafb;
+      --text:        #111827;
+      --subtext:     rgba(17,24,39,0.5);
+      --card-bg:     rgba(0,0,0,0.03);
+      --card-border: rgba(0,0,0,0.08);
+      --btn-bg:      #111827;
+      --btn-text:    #ffffff;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Faint radial glow matching your hero */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    html[data-theme="dark"]  body::before { background: radial-gradient(ellipse at 50% 20%, rgba(16,185,129,0.08) 0%, transparent 70%); }
+    html[data-theme="light"] body::before { background: radial-gradient(ellipse at 50% 20%, rgba(16,185,129,0.06) 0%, transparent 70%); }
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0; width: 100%;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 200;
+      border-bottom: 1px solid;
+    }
+    body[data-theme="dark"]  .navbar { background: #05080b; border-bottom-color: #1f2933; }
+    body[data-theme="light"] .navbar { background: #ffffff; border-bottom-color: #e5e7eb; }
+
+    .logo { display: flex; align-items: center; }
+    .logo-img { height: 22px; width: auto; display: none; }
+    body[data-theme="dark"]  .logo-dark  { display: block; }
+    body[data-theme="light"] .logo-light { display: block; }
+
+    /* Main content */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .offline-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--subtext);
+      max-width: 340px;
+      margin-bottom: 36px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 44px;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 999px;
+      border: 2px solid var(--btn-bg);
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.01em;
+      transition: all 0.2s ease;
+    }
+    body[data-theme="dark"]  .btn:hover { background: transparent; color: #ffffff; border-color: #ffffff; }
+    body[data-theme="light"] .btn:hover { background: transparent; color: #111827; border-color: #111827; }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      font-size: 0.8rem;
+      color: var(--subtext);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="logo-dark.png"  class="logo-img logo-dark"  alt="Teengro" />
+      <img src="logo-light.png" class="logo-img logo-light" alt="Teengro" />
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="offline-icon">📡</div>
+    <h1>You're offline</h1>
+    <p>Teengro needs an internet connection to power your AI tutor. Check your connection and try again.</p>
+    <button class="btn" onclick="window.location.reload()">Try again →</button>
+  </div>
+
+  <footer class="footer">© 2026 Teengro. Built by a teen, for teens.</footer>
+
+  <script>
+    // Also set on body to match your site's data-theme="dark" on <body>
+    const theme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', theme);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Teengro's Privacy Policy — how we collect, use, and protect your data." />
+  <title>Privacy Policy | Teengro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#111827">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+
+    .about-hero {
+      min-height: 38vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 28px 60px;
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .about-hero::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 500px;
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    body[data-theme="dark"]  .about-hero::before { background: radial-gradient(ellipse at 50% 25%, rgba(16,185,129,0.08) 0%, transparent 70%); }
+    body[data-theme="light"] .about-hero::before { background: radial-gradient(ellipse at 50% 25%, rgba(16,185,129,0.06) 0%, transparent 70%); }
+    .about-hero > * { position: relative; z-index: 1; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 999px;
+      margin-bottom: 28px;
+    }
+    body[data-theme="dark"]  .hero-eyebrow { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+    body[data-theme="light"] .hero-eyebrow { background: rgba(16,185,129,0.08); color: #059669; border: 1px solid rgba(16,185,129,0.2); }
+
+    .about-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    .about-hero .hero-desc {
+      font-size: 1rem;
+      line-height: 1.72;
+      opacity: 0.55;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .about-section {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 28px 56px;
+    }
+    .about-section h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.32;
+      margin-bottom: 20px;
+    }
+    .about-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      margin-top: 28px;
+      opacity: 0.9;
+    }
+    .about-section p {
+      font-size: 0.95rem;
+      line-height: 1.78;
+      margin-bottom: 14px;
+      opacity: 0.78;
+    }
+    .about-section p strong { opacity: 1; font-weight: 600; }
+    .about-section ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .about-section li {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      opacity: 0.7;
+      padding-left: 22px;
+      position: relative;
+    }
+    .about-section li::before { content: '—'; position: absolute; left: 0; opacity: 0.35; }
+
+    .about-divider hr {
+      max-width: 640px;
+      margin: 0 auto 56px;
+      border: none;
+      border-top: 1px solid;
+    }
+    body[data-theme="dark"]  .about-divider hr { border-color: rgba(255,255,255,0.06); }
+    body[data-theme="light"] .about-divider hr { border-color: rgba(0,0,0,0.06); }
+
+    .last-updated {
+      font-size: 0.78rem;
+      opacity: 0.35;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+
+    .contact-card {
+      padding: 24px;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+    body[data-theme="dark"]  .contact-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
+    body[data-theme="light"] .contact-card { background: rgba(0,0,0,0.01); border: 1px solid rgba(0,0,0,0.06); }
+    .contact-card p { margin-bottom: 6px; }
+    .contact-card a { color: #10b981; text-decoration: none; }
+    body[data-theme="light"] .contact-card a { color: #059669; }
+    .contact-card a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body data-theme="dark">
+
+<header class="navbar navbar-animate">
+  <div class="logo">
+    <img src="logo-dark.png"  class="logo-img logo-dark"  alt="Teengro" />
+    <img src="logo-light.png" class="logo-img logo-light" alt="Teengro" />
+  </div>
+  <div class="nav-right">
+    <button class="profile-trigger" id="profileTriggerNav" title="My Profile">?</button>
+    <button class="hamburger" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="index.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a href="about.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>About Us</a>
+    <a href="founder.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Meet the Founder</a>
+    <a href="help.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help</a>
+    <div class="menu-divider"></div>
+    <a href="profile.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>My Profile</a>
+    <div class="menu-divider"></div>
+    <button id="themeToggle"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Change theme</button>
+    <div class="menu-divider"></div>
+    <a href="login.html" id="navLoginLink"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Login</a>
+    <button id="navLogoutBtn" onclick="logout()" style="display:none;"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+  </div>
+</header>
+
+<div class="about-hero">
+  <span class="hero-eyebrow">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Legal · Transparency
+  </span>
+  <h1>Privacy Policy</h1>
+  <p class="hero-desc">We keep it simple. Here's exactly what data we collect, why we collect it, and how we protect it.</p>
+</div>
+
+<p class="last-updated">Last updated: March 2026</p>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Overview</h2>
+  <p>Teengro ("we", "our", "us") is an AI-powered tutoring platform for students in grades 8–12, available at <strong>teengro.in</strong>. We are committed to protecting your privacy and being transparent about how your data is handled.</p>
+  <p>This Privacy Policy applies to all users of Teengro, including users of our website and mobile app.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Information We Collect</h2>
+
+  <h3>Account Information</h3>
+  <ul>
+    <li>Name and username you provide during signup</li>
+    <li>Email address used to create your account</li>
+    <li>Password (stored securely — we never see it in plain text)</li>
+    <li>Profile picture, if you choose to upload one</li>
+  </ul>
+
+  <h3>Learning Data</h3>
+  <ul>
+    <li>Class, board, and subject preferences you set</li>
+    <li>Questions you ask the AI tutor</li>
+    <li>Study time and usage activity</li>
+    <li>Day streak and session history</li>
+  </ul>
+
+  <h3>Technical Data</h3>
+  <ul>
+    <li>Time spent on the app</li>
+  </ul>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>How We Use Your Data</h2>
+  <ul>
+    <li>To create and manage your account</li>
+    <li>To personalise your learning experience (class, board, subject)</li>
+    <li>To power the AI tutor responses</li>
+    <li>To track your study streaks and progress</li>
+    <li>To improve Teengro's features and performance</li>
+    <li>To send important account-related emails (e.g. password reset)</li>
+  </ul>
+  <p>We <strong>do not</strong> sell your data to third parties. We <strong>do not</strong> use your data for advertising.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Third-Party Services</h2>
+  <p>Teengro uses the following trusted third-party services to operate:</p>
+  <ul>
+    <li><strong>Supabase</strong> — secure database and authentication</li>
+    <li><strong>Google Analytics</strong> — anonymous usage analytics to improve the app</li>
+    <li><strong>Google Fonts</strong> — typography rendering</li>
+    <li><strong>AI providers</strong> — to generate AI tutor responses</li>
+  </ul>
+  <p>Each of these services has their own privacy policies and data handling practices.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Data Storage & Security</h2>
+  <p>Your data is stored securely using <strong>Supabase</strong>, which uses industry-standard encryption. Passwords are hashed and never stored in plain text. We take reasonable steps to protect your information from unauthorised access.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Children's Privacy</h2>
+  <p>Teengro is designed for students in grades 8–12 (typically ages 13–18). We do not knowingly collect personal information from children under the age of 13 without parental consent. If you believe your child has provided us with personal data, please contact us and we will delete it promptly.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Your Rights</h2>
+  <ul>
+    <li>Access the personal data we hold about you</li>
+    <li>Request correction of inaccurate data</li>
+    <li>Request deletion of your account and data</li>
+    <li>Withdraw consent at any time by deleting your account</li>
+  </ul>
+  <p>To exercise any of these rights, contact us at the email below.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date at the top of this page. Continued use of Teengro after changes means you accept the updated policy.</p>
+</section>
+
+<div class="about-divider"><hr /></div>
+
+<section class="about-section">
+  <h2>Contact Us</h2>
+  <p>If you have any questions about this Privacy Policy or how your data is handled, reach out to us:</p>
+  <div class="contact-card">
+    <p><strong>Teengro</strong></p>
+    <p>Email: <a href="mailto:teengro.in@gmail.com">teengro.in@gmail.com</a></p>
+    <p>Website: <a href="https://teengro.in">teengro.in</a></p>
+  </div>
+</section>
+
+<footer class="about-footer animate-footer-in">© 2026 Teengro. Built by a teen, for teens. 
+  <br><br><a href="privacy.html" style="color:inherit; opacity:0.6; text-decoration:none;">Privacy Policy</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>My Profile | Teengro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .page-main { padding-top: 72px; }
+    
+    /* Profile Page Specific Styles */
+    .profile-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    
+    /* Hero Section */
+    .profile-hero {
+      text-align: center;
+      padding: 32px 20px 28px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      border: 1px solid;
+      position: relative;
+      overflow: hidden;
+    }
+    body[data-theme="dark"] .profile-hero {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, rgba(6, 78, 59, 0.08) 100%);
+      border-color: rgba(16, 185, 129, 0.12);
+    }
+    body[data-theme="light"] .profile-hero {
+      background: linear-gradient(145deg, rgba(29, 78, 216, 0.04) 0%, rgba(59, 130, 246, 0.06) 100%);
+      border-color: rgba(29, 78, 216, 0.1);
+    }
+    
+    .profile-hero-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin: 0 auto 16px;
+      position: relative;
+      border: 3px solid;
+      background-size: cover;
+      background-position: center;
+    }
+    body[data-theme="dark"] .profile-hero-avatar {
+      background-color: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    body[data-theme="light"] .profile-hero-avatar {
+      background-color: rgba(29, 78, 216, 0.1);
+      border-color: rgba(29, 78, 216, 0.2);
+      color: #1d4ed8;
+    }
+    
+    .profile-avatar-actions {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .profile-hero-avatar-edit,
+    .profile-hero-avatar-remove {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    body[data-theme="dark"] .profile-hero-avatar-edit {
+      background: #10b981;
+      color: #020617;
+    }
+    body[data-theme="light"] .profile-hero-avatar-edit {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    .profile-hero-avatar-edit:hover {
+      transform: scale(1.1);
+    }
+    
+    .profile-hero-avatar-remove {
+      background: rgba(239, 68, 68, 0.9);
+      color: #ffffff;
+    }
+    .profile-hero-avatar-remove:hover {
+      transform: scale(1.1);
+      background: #ef4444;
+    }
+    
+    .profile-hero-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    
+    .profile-hero-username {
+      font-size: 0.9rem;
+      opacity: 0.5;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    
+    .profile-hero-email {
+      font-size: 0.82rem;
+      opacity: 0.4;
+      margin-bottom: 14px;
+    }
+    
+    .profile-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    body[data-theme="dark"] .profile-hero-badge {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+    }
+    body[data-theme="light"] .profile-hero-badge {
+      background: rgba(29, 78, 216, 0.08);
+      color: #1d4ed8;
+    }
+    
+    /* Stats Grid */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (min-width: 540px) {
+      .profile-stats { grid-template-columns: repeat(4, 1fr); }
+    }
+    
+    .profile-stat-card {
+      padding: 18px 14px;
+      border-radius: 14px;
+      text-align: center;
+      border: 1px solid;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    .profile-stat-card:hover {
+      transform: translateY(-2px);
+    }
+    body[data-theme="dark"] .profile-stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="dark"] .profile-stat-card:hover {
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.06);
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+    body[data-theme="light"] .profile-stat-card {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    body[data-theme="light"] .profile-stat-card:hover {
+      box-shadow: 0 8px 24px rgba(29, 78, 216, 0.05);
+      border-color: rgba(29, 78, 216, 0.12);
+    }
+    
+    .profile-stat-icon {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    
+    .profile-stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    
+    .profile-stat-label {
+      font-size: 0.72rem;
+      opacity: 0.45;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    
+    /* Bio Section */
+    .profile-bio-card {
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid;
+    }
+    body[data-theme="dark"] .profile-bio-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="light"] .profile-bio-card {
+      background: rgba(0, 0, 0, 0.015);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    .profile-bio-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.4;
+      margin-bottom: 10px;
+    }
+    
+    .profile-bio-text {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      opacity: 0.8;
+    }
+    
+    .profile-bio-empty {
+      font-size: 0.88rem;
+      opacity: 0.35;
+      font-style: italic;
+    }
+    
+    /* Info Section */
+    .profile-info-card {
+      padding: 8px 0;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid;
+      overflow: hidden;
+    }
+    body[data-theme="dark"] .profile-info-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="light"] .profile-info-card {
+      background: rgba(0, 0, 0, 0.015);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    .profile-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      transition: background 0.15s ease;
+    }
+    body[data-theme="dark"] .profile-info-row:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    body[data-theme="light"] .profile-info-row:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    
+    .profile-info-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .profile-info-icon {
+      font-size: 1.1rem;
+      opacity: 0.7;
+    }
+    
+    .profile-info-label {
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+    
+    .profile-info-value {
+      font-size: 0.88rem;
+      opacity: 0.55;
+      font-weight: 500;
+    }
+    
+    /* Edit Section */
+    .profile-edit-card {
+      padding: 24px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid;
+    }
+    body[data-theme="dark"] .profile-edit-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="light"] .profile-edit-card {
+      background: rgba(0, 0, 0, 0.015);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    .profile-edit-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+    
+    .profile-edit-grid {
+      display: grid;
+      gap: 18px;
+    }
+    
+    .profile-edit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 480px) {
+      .profile-edit-row { grid-template-columns: 1fr; }
+    }
+    
+    .profile-edit-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      opacity: 0.6;
+    }
+    
+    .profile-edit-field input,
+    .profile-edit-field select,
+    .profile-edit-field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border: 1px solid;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    body[data-theme="dark"] .profile-edit-field input,
+    body[data-theme="dark"] .profile-edit-field select,
+    body[data-theme="dark"] .profile-edit-field textarea {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #e5e7eb;
+    }
+    body[data-theme="dark"] .profile-edit-field input:focus,
+    body[data-theme="dark"] .profile-edit-field select:focus,
+    body[data-theme="dark"] .profile-edit-field textarea:focus {
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    body[data-theme="light"] .profile-edit-field input,
+    body[data-theme="light"] .profile-edit-field select,
+    body[data-theme="light"] .profile-edit-field textarea {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #111827;
+    }
+    body[data-theme="light"] .profile-edit-field input:focus,
+    body[data-theme="light"] .profile-edit-field select:focus,
+    body[data-theme="light"] .profile-edit-field textarea:focus {
+      border-color: rgba(29, 78, 216, 0.4);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.08);
+    }
+    
+    .profile-edit-hint {
+      font-size: 0.72rem;
+      opacity: 0.4;
+      margin-top: 5px;
+    }
+    
+    .profile-save-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.15s ease, box-shadow 0.25s ease;
+    }
+    body[data-theme="dark"] .profile-save-btn {
+      background: #10b981;
+      color: #020617;
+    }
+    body[data-theme="dark"] .profile-save-btn:hover {
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+      transform: translateY(-1px);
+    }
+    body[data-theme="light"] .profile-save-btn {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    body[data-theme="light"] .profile-save-btn:hover {
+      box-shadow: 0 8px 24px rgba(29, 78, 216, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .profile-save-msg {
+      text-align: center;
+      font-size: 0.82rem;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+    .profile-save-msg.success { color: #10b981; }
+    .profile-save-msg.error { color: #ef4444; }
+    
+    /* ── Inline Edit Styles for Profile Page ── */
+    .profile-hero-name-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .profile-hero-name-edit {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.4; transition: opacity 0.2s, background 0.15s;
+    }
+    body[data-theme="dark"] .profile-hero-name-edit {
+      background: rgba(255,255,255,0.08); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-hero-name-edit {
+      background: rgba(0,0,0,0.06); color: #374151;
+    }
+    .profile-hero-name-edit:hover, .profile-hero-name-edit:active {
+      opacity: 1;
+      background: rgba(16,185,129,0.2); color: #10b981;
+    }
+    .profile-hero-name-input {
+      padding: 8px 16px; border-radius: 10px;
+      font-size: 1.5rem; font-weight: 700; font-family: inherit;
+      text-align: center; outline: none; max-width: 280px;
+      letter-spacing: -0.02em;
+    }
+    body[data-theme="dark"] .profile-hero-name-input {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-hero-name-input {
+      background: #ffffff; border: 1px solid rgba(0,0,0,0.15); color: #111827;
+    }
+    
+    .profile-info-row { position: relative; }
+    .profile-inline-edit-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.4; transition: opacity 0.15s, background 0.15s;
+      flex-shrink: 0; margin-left: 10px;
+    }
+    body[data-theme="dark"] .profile-inline-edit-btn {
+      background: rgba(255,255,255,0.06); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-inline-edit-btn {
+      background: rgba(0,0,0,0.04); color: #374151;
+    }
+    .profile-inline-edit-btn:hover, .profile-inline-edit-btn:active {
+      opacity: 1;
+      background: rgba(16,185,129,0.15); color: #10b981;
+    }
+    
+    .profile-inline-input {
+      flex: 1; padding: 8px 12px; border-radius: 8px;
+      font-size: 0.88rem; font-family: inherit; outline: none;
+      min-width: 0; max-width: 160px;
+    }
+    body[data-theme="dark"] .profile-inline-input {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-inline-input {
+      background: #ffffff; border: 1px solid rgba(0,0,0,0.15); color: #111827;
+    }
+    
+    .profile-inline-select {
+      padding: 8px 12px; border-radius: 8px;
+      font-size: 0.88rem; font-family: inherit; outline: none; cursor: pointer;
+    }
+    body[data-theme="dark"] .profile-inline-select {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-inline-select {
+      background: #ffffff; border: 1px solid rgba(0,0,0,0.15); color: #111827;
+    }
+    
+    .profile-inline-actions {
+      display: flex; align-items: center; gap: 6px; margin-left: 10px;
+    }
+    .profile-inline-save-btn, .profile-inline-cancel-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .profile-inline-save-btn {
+      background: rgba(16,185,129,0.15); color: #10b981;
+    }
+    .profile-inline-save-btn:hover, .profile-inline-save-btn:active {
+      background: rgba(16,185,129,0.25); transform: scale(1.05);
+    }
+    .profile-inline-cancel-btn {
+      background: rgba(239,68,68,0.1); color: #f87171;
+    }
+    .profile-inline-cancel-btn:hover, .profile-inline-cancel-btn:active {
+      background: rgba(239,68,68,0.18); transform: scale(1.05);
+    }
+    
+    /* Bio inline edit */
+    .profile-bio-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .profile-bio-edit-btn {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.5; transition: opacity 0.15s, background 0.15s;
+    }
+    body[data-theme="dark"] .profile-bio-edit-btn {
+      background: rgba(255,255,255,0.06); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-bio-edit-btn {
+      background: rgba(0,0,0,0.04); color: #374151;
+    }
+    .profile-bio-edit-btn:hover, .profile-bio-edit-btn:active {
+      opacity: 1;
+      background: rgba(16,185,129,0.15); color: #10b981;
+    }
+    
+    .profile-bio-edit-area {
+      display: none; flex-direction: column; gap: 10px;
+    }
+    .profile-bio-edit-area.active { display: flex; }
+    .profile-bio-textarea {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      font-size: 0.92rem; font-family: inherit; outline: none;
+      resize: none; line-height: 1.6;
+    }
+    body[data-theme="dark"] .profile-bio-textarea {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #e5e7eb;
+    }
+    body[data-theme="light"] .profile-bio-textarea {
+      background: #ffffff; border: 1px solid rgba(0,0,0,0.1); color: #111827;
+    }
+    .profile-bio-edit-actions {
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+    .profile-bio-save-btn, .profile-bio-cancel-btn {
+      padding: 8px 18px; border-radius: 8px; border: none;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .profile-bio-save-btn {
+      background: #10b981; color: #020617;
+    }
+    .profile-bio-save-btn:hover, .profile-bio-save-btn:active { opacity: 0.9; }
+    .profile-bio-cancel-btn {
+      background: rgba(128,128,128,0.12); color: inherit;
+    }
+    .profile-bio-cancel-btn:hover, .profile-bio-cancel-btn:active { background: rgba(128,128,128,0.2); }
+    
+    /* Achievements */
+    .profile-achievements-card {
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid;
+    }
+    body[data-theme="dark"] .profile-achievements-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="light"] .profile-achievements-card {
+      background: rgba(0, 0, 0, 0.015);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    .profile-achievements-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .profile-achievements-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    
+    .profile-achievements-count {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      opacity: 0.6;
+    }
+    body[data-theme="dark"] .profile-achievements-count {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    body[data-theme="light"] .profile-achievements-count {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    
+    .profile-achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+    }
+    
+    .profile-badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 8px;
+      border-radius: 12px;
+      cursor: default;
+      transition: transform 0.15s, background 0.15s;
+      text-align: center;
+    }
+    body[data-theme="dark"] .profile-badge-item {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    body[data-theme="light"] .profile-badge-item {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    
+    .profile-badge-item:hover {
+      transform: scale(1.03);
+    }
+    body[data-theme="dark"] .profile-badge-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    body[data-theme="light"] .profile-badge-item:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .profile-badge-item.locked {
+      opacity: 0.3;
+      filter: grayscale(100%);
+    }
+    
+    .profile-badge-item.earned {
+      opacity: 1;
+    }
+    body[data-theme="dark"] .profile-badge-item.earned {
+      background: rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15);
+    }
+    body[data-theme="light"] .profile-badge-item.earned {
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15);
+    }
+    
+    .profile-badge-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    
+    .profile-badge-name {
+      font-size: 0.68rem;
+      font-weight: 600;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    
+    .profile-badge-desc {
+      font-size: 0.6rem;
+      opacity: 0.5;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    
+    /* Actions */
+    .profile-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .profile-action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .profile-action-btn.logout {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .profile-action-btn.logout:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    /* Logged out state */
+    .profile-logged-out {
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .profile-logged-out-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+    .profile-logged-out-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .profile-logged-out-sub {
+      font-size: 0.9rem;
+      opacity: 0.5;
+      margin-bottom: 28px;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .profile-logged-out-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+    .profile-logged-out-btn {
+      display: block;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.15s ease, box-shadow 0.25s ease;
+    }
+    body[data-theme="dark"] .profile-logged-out-btn.primary {
+      background: #10b981;
+      color: #020617;
+    }
+    body[data-theme="light"] .profile-logged-out-btn.primary {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    .profile-logged-out-btn.primary:hover {
+      transform: translateY(-1px);
+    }
+    .profile-logged-out-btn.ghost {
+      border: 1px solid;
+    }
+    body[data-theme="dark"] .profile-logged-out-btn.ghost {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: inherit;
+    }
+    body[data-theme="light"] .profile-logged-out-btn.ghost {
+      border-color: rgba(0, 0, 0, 0.15);
+      color: inherit;
+    }
+  </style>
+</head>
+
+<body class="about-body" data-theme="dark">
+
+<header class="navbar navbar-animate">
+  <a href="index.html" class="logo" title="Go to Home">
+    <img src="logo-dark.png"  class="logo-img logo-dark"  alt="Teengro" />
+    <img src="logo-light.png" class="logo-img logo-light" alt="Teengro" />
+  </a>
+  <div class="nav-right">
+    <button class="profile-trigger" id="profileTriggerNav" title="My Profile">?</button>
+    <button class="hamburger" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="index.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a href="about.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>About Us</a>
+    <a href="founder.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Meet the Founder</a>
+    <a href="help.html"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help</a>
+    <div class="menu-divider"></div>
+    <a href="profile.html" class="active"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>My Profile</a>
+    <div class="menu-divider"></div>
+    <button id="themeToggle"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Change theme</button>
+    <div class="menu-divider"></div>
+    <a href="login.html" id="navLoginLink"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Login</a>
+    <button id="navLogoutBtn" onclick="logout()" style="display:none;"><svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+  </div>
+</header>
+
+<main class="page-main">
+  <div class="profile-page">
+    
+    <!-- Logged Out State -->
+    <div class="profile-logged-out" id="profileLoggedOut" style="display:none;">
+      <div class="profile-logged-out-icon">👤</div>
+      <div class="profile-logged-out-title">You're not logged in</div>
+      <div class="profile-logged-out-sub">Login to view your profile, streaks, and study stats.</div>
+      <div class="profile-logged-out-btns">
+        <a href="login.html" class="profile-logged-out-btn primary">Login</a>
+        <a href="signup.html" class="profile-logged-out-btn ghost">Create account</a>
+      </div>
+    </div>
+    
+    <!-- Logged In State -->
+    <div id="profileLoggedIn" style="display:none;">
+      
+      <!-- Hero Section -->
+      <div class="profile-hero">
+        <div class="profile-hero-avatar" id="profileAvatar">?</div>
+        <div class="profile-avatar-actions">
+          <label class="profile-hero-avatar-edit" title="Change photo" for="profilePhotoInput">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </label>
+          <button class="profile-hero-avatar-remove" id="profilePhotoRemove" title="Remove photo" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" />
+        <div class="profile-hero-name" id="profileName">Loading…</div>
+        <div class="profile-hero-username" id="profileUsername"></div>
+        <div class="profile-hero-email" id="profileEmail"></div>
+        <div class="profile-hero-badge">
+          <span>📚</span>
+          <span id="profileBadge">Student</span>
+        </div>
+      </div>
+      
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon">🔥</div>
+          <div class="profile-stat-value" id="profileStreak">0</div>
+          <div class="profile-stat-label">Day Streak</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon">⏱️</div>
+          <div class="profile-stat-value" id="profileTime">0m</div>
+          <div class="profile-stat-label">Study Time</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon">💬</div>
+          <div class="profile-stat-value" id="profileQuestions">0</div>
+          <div class="profile-stat-label">Questions</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon">📅</div>
+          <div class="profile-stat-value" id="profileJoined">—</div>
+          <div class="profile-stat-label">Joined</div>
+        </div>
+      </div>
+      
+      <!-- Bio -->
+      <div class="profile-bio-card" id="profileBioCard">
+        <div class="profile-bio-header">
+          <span class="profile-bio-title">About</span>
+          <button class="profile-bio-edit-btn" id="profileBioEditBtn" title="Edit bio">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+        <div class="profile-bio-text" id="profileBioText"></div>
+        <div class="profile-bio-empty" id="profileBioEmpty" style="display:none;">No bio added yet</div>
+        <div class="profile-bio-edit-area" id="profileBioEditArea">
+          <textarea class="profile-bio-textarea" id="profileBioTextarea" placeholder="Write a short bio…" rows="3"></textarea>
+          <div class="profile-bio-edit-actions">
+            <button class="profile-bio-cancel-btn" id="profileBioCancelBtn">Cancel</button>
+            <button class="profile-bio-save-btn" id="profileBioSaveBtn">Save</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Info -->
+      <div class="profile-info-card">
+        <div class="profile-info-row" id="profileNameRowWrap">
+          <div class="profile-info-left">
+            <span class="profile-info-icon">✏️</span>
+            <span class="profile-info-label">Name</span>
+          </div>
+          <span class="profile-info-value" id="profileNameInfo">—</span>
+          <button class="profile-inline-edit-btn" data-field="name" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+        <div class="profile-info-row" id="profileUsernameRowWrap">
+          <div class="profile-info-left">
+            <span class="profile-info-icon">🪪</span>
+            <span class="profile-info-label">Username</span>
+          </div>
+          <span class="profile-info-value" id="profileUsernameInfo">—</span>
+          <button class="profile-inline-edit-btn" data-field="username" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+        <div class="profile-info-row" id="profileClassRowWrap">
+          <div class="profile-info-left">
+            <span class="profile-info-icon">🏫</span>
+            <span class="profile-info-label">Class</span>
+          </div>
+          <span class="profile-info-value" id="profileClass">—</span>
+          <button class="profile-inline-edit-btn" data-field="class" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+        <div class="profile-info-row" id="profileBoardRowWrap">
+          <div class="profile-info-left">
+            <span class="profile-info-icon">📋</span>
+            <span class="profile-info-label">Board</span>
+          </div>
+          <span class="profile-info-value" id="profileBoard">—</span>
+          <button class="profile-inline-edit-btn" data-field="board" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+        <div class="profile-info-row">
+          <div class="profile-info-left">
+            <span class="profile-info-icon">📖</span>
+            <span class="profile-info-label">Last Subject</span>
+          </div>
+          <span class="profile-info-value" id="profileLastSubject">—</span>
+        </div>
+      </div>
+      
+      <!-- Achievements -->
+      <div class="profile-achievements-card">
+        <div class="profile-achievements-header">
+          <div class="profile-achievements-title">
+            <span>🏆</span>
+            <span>Achievements</span>
+          </div>
+          <span class="profile-achievements-count" id="profileBadgesCount">0/0</span>
+        </div>
+        <div class="profile-achievements-grid" id="profileBadgesGrid">
+          <!-- Badges will be populated by JS -->
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="profile-actions">
+        <button class="profile-action-btn logout" onclick="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+      
+    </div>
+    
+  </div>
+</main>
+
+<script src="script.js"></script>
+<script>
+// Profile page specific logic
+let _profileData = {};
+
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!supabaseClient) {
+    document.getElementById("profileLoggedOut").style.display = "";
+    return;
+  }
+  
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  if (!session) {
+    document.getElementById("profileLoggedOut").style.display = "";
+    return;
+  }
+  
+  document.getElementById("profileLoggedIn").style.display = "";
+  
+  const userId = session.user.id;
+  const email = session.user.email;
+  
+  // Fetch profile
+  const { data: profile } = await supabaseClient
+    .from("user_profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+  
+  if (profile) {
+    _profileData = { ...profile };
+    
+    // Avatar
+    const avatarEl = document.getElementById("profileAvatar");
+    if (profile.avatar_url) {
+      avatarEl.style.backgroundImage = `url(${profile.avatar_url})`;
+      avatarEl.textContent = "";
+    } else {
+      avatarEl.textContent = getInitials(profile.full_name);
+    }
+    
+    // Hero info
+    document.getElementById("profileName").textContent = profile.full_name || "Student";
+    document.getElementById("profileUsername").textContent = profile.username ? `@${profile.username}` : "";
+    document.getElementById("profileEmail").textContent = email;
+    
+    // Badge
+    const classNum = parseInt(profile.class_level) || 10;
+    document.getElementById("profileBadge").textContent = `Class ${classNum} · ${profile.board || "ICSE"}`;
+    
+    // Stats
+    document.getElementById("profileStreak").textContent = profile.streak || 0;
+    document.getElementById("profileQuestions").textContent = profile.questions_count || 0;
+    
+    // Time is handled by script.js which sets lastKnownDBTotal
+    
+    // Joined date
+    if (profile.created_at) {
+      const joined = new Date(profile.created_at);
+      document.getElementById("profileJoined").textContent = joined.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+    }
+    
+    // Bio
+    const bioText = document.getElementById("profileBioText");
+    const bioEmpty = document.getElementById("profileBioEmpty");
+    if (profile.bio && profile.bio.trim()) {
+      bioText.textContent = profile.bio;
+      bioText.style.display = "";
+      bioEmpty.style.display = "none";
+    } else {
+      bioText.style.display = "none";
+      bioEmpty.style.display = "";
+    }
+    
+    // Info rows
+    document.getElementById("profileNameInfo").textContent = profile.full_name || "—";
+    document.getElementById("profileUsernameInfo").textContent = profile.username || "—";
+    document.getElementById("profileClass").textContent = profile.class_level ? `Class ${profile.class_level}` : "—";
+    document.getElementById("profileBoard").textContent = profile.board || "—";
+    document.getElementById("profileLastSubject").textContent = profile.last_subject || "—";
+    
+    // Render achievements
+    renderProfilePageBadges(profile);
+    
+    // Show remove button if avatar exists
+    const removeBtn = document.getElementById("profilePhotoRemove");
+    if (profile.avatar_url && removeBtn) {
+      removeBtn.style.display = "flex";
+    }
+  }
+  
+  // Initialize inline edits
+  initProfilePageInlineEdits(userId);
+  
+  // Photo upload
+  document.getElementById("profilePhotoInput").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const base64 = ev.target.result;
+      
+      // Update avatar immediately
+      const avatarEl = document.getElementById("profileAvatar");
+      avatarEl.style.backgroundImage = `url(${base64})`;
+      avatarEl.textContent = "";
+      
+      // Show remove button
+      const removeBtn = document.getElementById("profilePhotoRemove");
+      if (removeBtn) removeBtn.style.display = "flex";
+      
+      // Save to database
+      await supabaseClient
+        .from("user_profiles")
+        .update({ avatar_url: base64 })
+        .eq("id", userId);
+      
+      _profileData.avatar_url = base64;
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  // Photo remove
+  document.getElementById("profilePhotoRemove")?.addEventListener("click", async () => {
+    const avatarEl = document.getElementById("profileAvatar");
+    
+    // Remove image and show initials
+    avatarEl.style.backgroundImage = "";
+    avatarEl.textContent = getInitials(_profileData.full_name);
+    
+    // Hide remove button
+    const removeBtn = document.getElementById("profilePhotoRemove");
+    if (removeBtn) removeBtn.style.display = "none";
+    
+    // Save to database
+    await supabaseClient
+      .from("user_profiles")
+      .update({ avatar_url: null })
+      .eq("id", userId);
+    
+    _profileData.avatar_url = null;
+  });
+});
+
+// Save a single field
+async function saveProfileField(field, value, userId) {
+  const updates = {};
+  
+  switch (field) {
+    case 'name':
+      updates.full_name = value;
+      break;
+    case 'username':
+      if (value && !/^[a-zA-Z0-9_.]+$/.test(value)) {
+        alert("Username can only contain letters, numbers, _ and .");
+        return false;
+      }
+      if (value && value.length < 3) {
+        alert("Username must be at least 3 characters.");
+        return false;
+      }
+      if (value) {
+        const { data: taken } = await supabaseClient.from("user_profiles")
+          .select("id").eq("username", value.toLowerCase()).neq("id", userId).limit(1);
+        if (taken && taken.length > 0) {
+          alert("Username already taken.");
+          return false;
+        }
+      }
+      updates.username = value.toLowerCase();
+      break;
+    case 'bio':
+      updates.bio = value;
+      break;
+    case 'class':
+      updates.class_level = value;
+      break;
+    case 'board':
+      updates.board = value;
+      break;
+    default:
+      return false;
+  }
+
+  try {
+    await supabaseClient.from("user_profiles").update(updates).eq("id", userId);
+    Object.assign(_profileData, updates);
+    refreshProfilePageUI(field, value);
+    return true;
+  } catch (e) {
+    console.error("Save failed:", e);
+    return false;
+  }
+}
+
+// Refresh UI after save
+function refreshProfilePageUI(field, value) {
+  switch (field) {
+    case 'name':
+      document.getElementById("profileName").textContent = value || "Student";
+      document.getElementById("profileNameInfo").textContent = value || "—";
+      const avatarEl = document.getElementById("profileAvatar");
+      if (!_profileData.avatar_url) {
+        avatarEl.textContent = getInitials(value);
+      }
+      break;
+    case 'username':
+      document.getElementById("profileUsername").textContent = value ? "@" + value : "";
+      document.getElementById("profileUsernameInfo").textContent = value || "—";
+      break;
+    case 'bio':
+      const bioText = document.getElementById("profileBioText");
+      const bioEmpty = document.getElementById("profileBioEmpty");
+      if (value && value.trim()) {
+        bioText.textContent = value;
+        bioText.style.display = "";
+        bioEmpty.style.display = "none";
+      } else {
+        bioText.style.display = "none";
+        bioEmpty.style.display = "";
+      }
+      break;
+    case 'class':
+      document.getElementById("profileClass").textContent = `Class ${value}`;
+      document.getElementById("profileBadge").textContent = `Class ${value} · ${_profileData.board || "ICSE"}`;
+      break;
+    case 'board':
+      document.getElementById("profileBoard").textContent = value;
+      document.getElementById("profileBadge").textContent = `Class ${_profileData.class_level || "10"} · ${value}`;
+      break;
+  }
+}
+
+// Initialize inline edit handlers
+function initProfilePageInlineEdits(userId) {
+  // Bio inline edit
+  const bioEditBtn = document.getElementById("profileBioEditBtn");
+  const bioText = document.getElementById("profileBioText");
+  const bioEmpty = document.getElementById("profileBioEmpty");
+  const bioEditArea = document.getElementById("profileBioEditArea");
+  const bioTextarea = document.getElementById("profileBioTextarea");
+  const bioSaveBtn = document.getElementById("profileBioSaveBtn");
+  const bioCancelBtn = document.getElementById("profileBioCancelBtn");
+  
+  if (bioEditBtn && bioEditArea) {
+    bioEditBtn.addEventListener("click", () => {
+      const currentBio = _profileData.bio || "";
+      bioTextarea.value = currentBio;
+      bioText.style.display = "none";
+      bioEmpty.style.display = "none";
+      bioEditArea.classList.add("active");
+      bioTextarea.focus();
+    });
+    
+    bioCancelBtn?.addEventListener("click", () => {
+      bioEditArea.classList.remove("active");
+      if (_profileData.bio && _profileData.bio.trim()) {
+        bioText.style.display = "";
+      } else {
+        bioEmpty.style.display = "";
+      }
+    });
+    
+    bioSaveBtn?.addEventListener("click", async () => {
+      const val = bioTextarea.value.trim();
+      const success = await saveProfileField("bio", val, userId);
+      if (success) {
+        bioEditArea.classList.remove("active");
+      }
+    });
+  }
+  
+  // Info row inline edits
+  document.querySelectorAll(".profile-inline-edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const field = btn.dataset.field;
+      const row = btn.closest(".profile-info-row");
+      const valueEl = row.querySelector(".profile-info-value");
+      const currentValue = valueEl.textContent;
+      
+      valueEl.style.display = "none";
+      btn.style.display = "none";
+      
+      let inputEl;
+      if (field === "class") {
+        inputEl = document.createElement("select");
+        inputEl.className = "profile-inline-select";
+        [8, 9, 10, 11, 12].forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = `Class ${c}`;
+          if (currentValue === `Class ${c}`) opt.selected = true;
+          inputEl.appendChild(opt);
+        });
+      } else if (field === "board") {
+        inputEl = document.createElement("select");
+        inputEl.className = "profile-inline-select";
+        ["ICSE", "CBSE", "SSLC"].forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b;
+          opt.textContent = b;
+          if (currentValue === b) opt.selected = true;
+          inputEl.appendChild(opt);
+        });
+      } else {
+        inputEl = document.createElement("input");
+        inputEl.type = "text";
+        inputEl.className = "profile-inline-input";
+        inputEl.value = currentValue === "—" ? "" : currentValue;
+        if (field === "username") inputEl.placeholder = "username";
+      }
+      
+      const actions = document.createElement("div");
+      actions.className = "profile-inline-actions";
+      
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "profile-inline-save-btn";
+      saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "profile-inline-cancel-btn";
+      cancelBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      
+      row.insertBefore(inputEl, valueEl);
+      row.appendChild(actions);
+      inputEl.focus();
+      
+      const cleanup = () => {
+        inputEl.remove();
+        actions.remove();
+        valueEl.style.display = "";
+        btn.style.display = "";
+      };
+      
+      const save = async () => {
+        let val = inputEl.value;
+        if (field === "username") val = val.trim().toLowerCase();
+        const success = await saveProfileField(field, val, userId);
+        if (success) cleanup();
+      };
+      
+      saveBtn.addEventListener("click", save);
+      cancelBtn.addEventListener("click", cleanup);
+      
+      if (inputEl.tagName === "INPUT") {
+        inputEl.addEventListener("keydown", e => {
+          if (e.key === "Enter") { e.preventDefault(); save(); }
+          if (e.key === "Escape") cleanup();
+        });
+      }
+      
+      if (inputEl.tagName === "SELECT") {
+        inputEl.addEventListener("change", save);
+      }
+    });
+  });
+}
+
+function getInitials(name) {
+  if (!name) return "?";
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+}
+
+// Render badges on profile page
+function renderProfilePageBadges(profile) {
+  const grid = document.getElementById("profileBadgesGrid");
+  const countEl = document.getElementById("profileBadgesCount");
+  if (!grid) return;
+  
+  // Get earned badges from profile or localStorage
+  let earned = [];
+  if (profile.badges && Array.isArray(profile.badges)) {
+    earned = profile.badges;
+    // Also save to localStorage
+    localStorage.setItem("earnedBadges", JSON.stringify(earned));
+  } else {
+    try {
+      earned = JSON.parse(localStorage.getItem("earnedBadges") || "[]");
+    } catch { earned = []; }
+  }
+  
+  const total = BADGE_DEFINITIONS.length;
+  const earnedCount = earned.length;
+  
+  if (countEl) countEl.textContent = `${earnedCount}/${total}`;
+  
+  let html = "";
+  
+  for (const badge of BADGE_DEFINITIONS) {
+    const isEarned = earned.includes(badge.id);
+    const earnedClass = isEarned ? "earned" : "locked";
+    
+    html += `
+      <div class="profile-badge-item ${earnedClass}" title="${badge.desc}">
+        <span class="profile-badge-icon">${badge.icon}</span>
+        <span class="profile-badge-name">${badge.name}</span>
+      </div>
+    `;
+  }
+  
+  grid.innerHTML = html;
+}
+
+// Time display is handled by script.js global interval
+</script>
+</body>
+</html>
