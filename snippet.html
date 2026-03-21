@@ -5,155 +5,324 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="robots" content="noindex"/>
   <title>Shared Response | Teengro</title>
-  <link rel="stylesheet" href="styles.css" />
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    body[data-theme="dark"] {
+      background: linear-gradient(145deg, #0a0f1a 0%, #0f172a 50%, #0c1322 100%);
+      color: #e5e7eb;
+    }
+    body[data-theme="light"] {
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+      color: #1e293b;
+    }
+    
+    /* Background decoration */
+    .bg-decoration {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .bg-decoration::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+    }
+    
     .snippet-page {
+      position: relative;
+      z-index: 1;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
+      padding: 40px 20px 60px;
     }
     
     .snippet-container {
-      max-width: 700px;
+      max-width: 720px;
       width: 100%;
     }
     
+    /* Header */
     .snippet-header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
     }
     
     .snippet-logo {
-      height: 28px;
-      margin-bottom: 20px;
+      height: 32px;
+      margin-bottom: 24px;
+      transition: transform 0.2s;
+    }
+    .snippet-logo:hover {
+      transform: scale(1.05);
     }
     
-    .snippet-title {
-      font-size: 1.1rem;
+    .snippet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
       font-weight: 600;
-      opacity: 0.5;
-      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    body[data-theme="dark"] .snippet-badge {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+    }
+    body[data-theme="light"] .snippet-badge {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
     }
     
+    /* Main Card */
     .snippet-card {
-      border-radius: 20px;
-      padding: 28px;
+      border-radius: 24px;
+      overflow: hidden;
       margin-bottom: 24px;
     }
     body[data-theme="dark"] .snippet-card {
-      background: #111827;
+      background: rgba(17, 24, 39, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.5),
+                  0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      backdrop-filter: blur(20px);
     }
     body[data-theme="light"] .snippet-card {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.12),
+                  0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      backdrop-filter: blur(20px);
     }
     
-    .snippet-question {
-      margin-bottom: 24px;
-      padding-bottom: 24px;
+    /* Sharer Info */
+    .snippet-sharer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 28px;
       border-bottom: 1px solid;
     }
-    body[data-theme="dark"] .snippet-question {
-      border-color: rgba(255, 255, 255, 0.08);
+    body[data-theme="dark"] .snippet-sharer {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
     }
-    body[data-theme="light"] .snippet-question {
-      border-color: rgba(0, 0, 0, 0.08);
+    body[data-theme="light"] .snippet-sharer {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.06);
     }
     
-    .snippet-label {
+    .snippet-sharer-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    body[data-theme="dark"] .snippet-sharer-avatar {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 2px solid rgba(16, 185, 129, 0.2);
+    }
+    body[data-theme="light"] .snippet-sharer-avatar {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border: 2px solid rgba(16, 185, 129, 0.15);
+    }
+    
+    .snippet-sharer-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .snippet-sharer-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    
+    .snippet-sharer-meta {
+      font-size: 0.78rem;
+      opacity: 0.5;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.72rem;
+    }
+    
+    .snippet-sharer-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.4;
+    }
+    
+    /* Question Section */
+    .snippet-question {
+      padding: 28px;
+      border-bottom: 1px solid;
+    }
+    body[data-theme="dark"] .snippet-question {
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    body[data-theme="light"] .snippet-question {
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    .snippet-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.4;
-      margin-bottom: 10px;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+    body[data-theme="dark"] .snippet-label {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.5);
+    }
+    body[data-theme="light"] .snippet-label {
+      background: rgba(0, 0, 0, 0.04);
+      color: rgba(0, 0, 0, 0.5);
     }
     
     .snippet-label-icon {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     
     .snippet-question-text {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 600;
       line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+    
+    /* Answer Section */
+    .snippet-answer {
+      padding: 28px;
     }
     
     .snippet-answer-text {
       font-size: 0.95rem;
-      line-height: 1.7;
+      line-height: 1.8;
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
     
+    /* Footer */
     .snippet-footer {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
     
     .snippet-cta {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 28px;
+      padding: 16px 32px;
       border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
       text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
-      background: #10b981;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #020617;
+      box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.4);
     }
     .snippet-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px -4px rgba(16, 185, 129, 0.5);
+    }
+    .snippet-cta:active {
+      transform: translateY(-1px);
+    }
+    
+    .snippet-cta-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .snippet-meta {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       opacity: 0.35;
-      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     
-    .snippet-loading,
-    .snippet-error {
+    /* Loading State */
+    .snippet-loading {
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
     }
     
     .snippet-loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(128, 128, 128, 0.2);
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(128, 128, 128, 0.15);
       border-top-color: #10b981;
       border-radius: 50%;
       animation: snippetSpin 0.8s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 24px;
     }
     @keyframes snippetSpin {
       to { transform: rotate(360deg); }
     }
     
+    .snippet-loading-text {
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+    
+    /* Error State */
+    .snippet-error {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    
     .snippet-error-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      opacity: 0.3;
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.2;
     }
     
     .snippet-error-title {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 8px;
     }
@@ -161,11 +330,51 @@
     .snippet-error-desc {
       font-size: 0.9rem;
       opacity: 0.5;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Powered by badge */
+    .powered-by {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      opacity: 0.3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .snippet-page {
+        padding: 24px 16px 80px;
+      }
+      .snippet-card {
+        border-radius: 20px;
+      }
+      .snippet-sharer,
+      .snippet-question,
+      .snippet-answer {
+        padding: 20px;
+      }
+      .snippet-question-text {
+        font-size: 1.05rem;
+      }
+      .snippet-cta {
+        padding: 14px 28px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body data-theme="dark">
+
+<div class="bg-decoration"></div>
 
 <div class="snippet-page">
   <div class="snippet-container">
@@ -176,33 +385,56 @@
         <img src="logo-dark.png" class="snippet-logo logo-dark" alt="Teengro" />
         <img src="logo-light.png" class="snippet-logo logo-light" alt="Teengro" />
       </a>
-      <div class="snippet-title">Shared Response</div>
+      <div class="snippet-badge">
+        <span>✨</span>
+        <span>Shared Knowledge</span>
+      </div>
     </div>
     
     <!-- Loading state -->
     <div class="snippet-loading" id="snippetLoading">
       <div class="snippet-loading-spinner"></div>
-      <div style="opacity: 0.5;">Loading snippet...</div>
+      <div class="snippet-loading-text">Loading shared response...</div>
     </div>
     
     <!-- Error state -->
     <div class="snippet-error" id="snippetError" style="display: none;">
       <div class="snippet-error-icon">🔗</div>
       <div class="snippet-error-title">Snippet not found</div>
-      <div class="snippet-error-desc">This link may have expired or doesn't exist.</div>
-      <a href="index.html" class="snippet-cta">Go to Teengro</a>
+      <div class="snippet-error-desc">This link may have expired or doesn't exist anymore.</div>
+      <a href="index.html" class="snippet-cta">
+        <span>Go to Teengro</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
     
     <!-- Content -->
     <div id="snippetContent" style="display: none;">
       <div class="snippet-card">
+        
+        <!-- Sharer Info -->
+        <div class="snippet-sharer">
+          <div class="snippet-sharer-avatar" id="sharerAvatar">?</div>
+          <div class="snippet-sharer-info">
+            <div class="snippet-sharer-name" id="sharerName">Student</div>
+            <div class="snippet-sharer-meta">
+              <span id="sharerDetails">Teengro User</span>
+              <span class="snippet-sharer-dot"></span>
+              <span id="snippetDate">Shared recently</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Question -->
         <div class="snippet-question">
           <div class="snippet-label">
-            <span class="snippet-label-icon">❓</span>
-            Question
+            <span class="snippet-label-icon">💬</span>
+            Question Asked
           </div>
           <div class="snippet-question-text" id="snippetQuestion"></div>
         </div>
+        
+        <!-- Answer -->
         <div class="snippet-answer">
           <div class="snippet-label">
             <span class="snippet-label-icon">🤖</span>
@@ -210,14 +442,21 @@
           </div>
           <div class="snippet-answer-text" id="snippetAnswer"></div>
         </div>
+        
       </div>
       
+      <!-- Footer CTA -->
       <div class="snippet-footer">
         <a href="dashboard.html" class="snippet-cta">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Try Teengro AI Tutor
+          <span class="snippet-cta-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <span>Ask Your Own Question</span>
         </a>
-        <div class="snippet-meta" id="snippetMeta"></div>
+        <div class="snippet-meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span id="snippetMeta">Powered by Teengro AI</span>
+        </div>
       </div>
     </div>
     
@@ -229,7 +468,7 @@
   const savedTheme = localStorage.getItem("theme") || "dark";
   document.body.setAttribute("data-theme", savedTheme);
   
-  // Logo visibility
+  // Logo visibility based on theme
   document.querySelectorAll('.snippet-logo').forEach(logo => {
     logo.style.display = 'none';
   });
@@ -246,6 +485,33 @@
   // Get snippet ID from URL
   const urlParams = new URLSearchParams(window.location.search);
   const snippetId = urlParams.get('id');
+  
+  // Get initials from name
+  function getInitials(name) {
+    if (!name) return "?";
+    return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  }
+  
+  // Format relative time
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  }
   
   // Load snippet
   async function loadSnippet() {
@@ -272,21 +538,38 @@
         return;
       }
       
+      // Populate sharer info
+      const avatarEl = document.getElementById('sharerAvatar');
+      const nameEl = document.getElementById('sharerName');
+      const detailsEl = document.getElementById('sharerDetails');
+      
+      if (data.sharer_avatar) {
+        avatarEl.style.backgroundImage = `url(${data.sharer_avatar})`;
+        avatarEl.textContent = "";
+      } else {
+        avatarEl.textContent = getInitials(data.sharer_name);
+      }
+      
+      nameEl.textContent = data.sharer_name || "Teengro Student";
+      
+      // Build details string
+      let details = [];
+      if (data.sharer_class) details.push(`Class ${data.sharer_class}`);
+      if (data.sharer_board) details.push(data.sharer_board);
+      detailsEl.textContent = details.length ? details.join(" · ") : "Teengro User";
+      
       // Populate content
       document.getElementById('snippetQuestion').textContent = data.question;
       document.getElementById('snippetAnswer').textContent = data.answer;
       
       // Format date
-      const createdAt = new Date(data.created_at);
-      const dateStr = createdAt.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      });
-      document.getElementById('snippetMeta').textContent = `Shared on ${dateStr}`;
+      document.getElementById('snippetDate').textContent = formatDate(data.created_at);
       
       // Update page title
-      document.title = `${data.question.slice(0, 50)}... | Teengro`;
+      const shortQuestion = data.question.length > 50 
+        ? data.question.slice(0, 50) + "..." 
+        : data.question;
+      document.title = `${shortQuestion} | Teengro`;
       
       // Show content
       loadingEl.style.display = 'none';
