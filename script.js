@@ -525,6 +525,8 @@ async function logout() {
   const { error } = await supabaseClient.auth.signOut();
   if (error) { alert("Logout failed. Try again."); return; }
   localStorage.removeItem("supabase.auth.token");
+  // Clear badges on logout to ensure they don't persist for signed-out users
+  localStorage.removeItem("earnedBadges");
   window.location.href = "login.html";
 }
 
@@ -2316,7 +2318,13 @@ async function loadProfilePanel() {
 ───────────────────────────────────────────── */
 
 // Get user's earned badges from localStorage (synced with Supabase)
-function getEarnedBadges() {
+// Returns empty array if user is not logged in
+async function getEarnedBadges() {
+  // Only return badges if user is authenticated
+  if (supabaseClient) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return [];
+  }
   try {
     return JSON.parse(localStorage.getItem("earnedBadges") || "[]");
   } catch {
@@ -2324,8 +2332,25 @@ function getEarnedBadges() {
   }
 }
 
-// Save earned badges to localStorage
-function saveEarnedBadges(badges) {
+// Synchronous version for non-critical UI rendering (checks cached auth state)
+function getEarnedBadgesSync() {
+  // Check if we have a cached logged-in state
+  const authToken = localStorage.getItem("sb-ctquajydjitfjhqvezfz-auth-token");
+  if (!authToken) return [];
+  try {
+    return JSON.parse(localStorage.getItem("earnedBadges") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+// Save earned badges to localStorage (only if authenticated)
+async function saveEarnedBadges(badges) {
+  // Only save badges if user is authenticated
+  if (supabaseClient) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return; // Don't save badges for non-authenticated users
+  }
   localStorage.setItem("earnedBadges", JSON.stringify(badges));
 }
 
@@ -2359,11 +2384,16 @@ function checkBadgeRequirement(badge, profile) {
   }
 }
 
-// Check all badges and unlock new ones
+// Check all badges and unlock new ones (requires authentication)
 async function checkAndUnlockBadges(profile) {
   if (!profile) return;
   
-  const earned = getEarnedBadges();
+  // Require authentication for badge system
+  if (!supabaseClient) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return; // Don't award badges to non-authenticated users
+  
+  const earned = await getEarnedBadges();
   const newBadges = [];
   
   for (const badge of BADGE_DEFINITIONS) {
@@ -2378,17 +2408,12 @@ async function checkAndUnlockBadges(profile) {
   }
   
   if (newBadges.length > 0) {
-    saveEarnedBadges(earned);
+    await saveEarnedBadges(earned);
     
     // Sync to Supabase
-    if (supabaseClient) {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) {
-        await supabaseClient.from("user_profiles")
-          .update({ badges: earned })
-          .eq("id", session.user.id);
-      }
-    }
+    await supabaseClient.from("user_profiles")
+      .update({ badges: earned })
+      .eq("id", session.user.id);
     
     // Show toast for each new badge
     for (const badge of newBadges) {
@@ -2408,12 +2433,22 @@ async function renderBadges(profile) {
   const countEl = document.getElementById("ppBadgesCount");
   if (!grid) return;
   
-  // Sync from Supabase if available
-  if (supabaseClient && profile.badges) {
-    saveEarnedBadges(profile.badges);
+  // Require authentication for badge display
+  if (!supabaseClient) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    // Show locked state for non-authenticated users
+    if (countEl) countEl.textContent = "0/0";
+    grid.innerHTML = '<div class="pp-badges-login-hint">Sign in to earn badges</div>';
+    return;
   }
   
-  const earned = getEarnedBadges();
+  // Sync from Supabase if available
+  if (profile.badges) {
+    await saveEarnedBadges(profile.badges);
+  }
+  
+  const earned = await getEarnedBadges();
   const total = BADGE_DEFINITIONS.length;
   const earnedCount = earned.length;
   
@@ -2500,9 +2535,14 @@ function showBadgeToast(badge) {
   }, 4000);
 }
 
-// Check time-based badges when user is active
-function checkTimeBadges() {
-  const earned = getEarnedBadges();
+// Check time-based badges when user is active (requires authentication)
+async function checkTimeBadges() {
+  // Require authentication for badge system
+  if (!supabaseClient) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return; // Don't award badges to non-authenticated users
+  
+  const earned = await getEarnedBadges();
   const hour = new Date().getHours();
   const day = new Date().getDay();
   
@@ -2533,9 +2573,9 @@ function checkTimeBadges() {
   }
   
   if (changed) {
-    saveEarnedBadges(earned);
+    await saveEarnedBadges(earned);
     // Sync to Supabase
-    syncBadgesToSupabase(earned);
+    await syncBadgesToSupabase(earned);
   }
 }
 
