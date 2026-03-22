@@ -632,8 +632,8 @@
       justify-content: center;
       padding: 14px 8px;
       border-radius: 12px;
-      cursor: default;
-      transition: transform 0.15s, background 0.15s;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s, box-shadow 0.2s;
       text-align: center;
     }
     body[data-theme="dark"] .profile-badge-item {
@@ -644,13 +644,19 @@
     }
     
     .profile-badge-item:hover {
-      transform: scale(1.03);
+      transform: scale(1.05);
     }
     body[data-theme="dark"] .profile-badge-item:hover {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
     body[data-theme="light"] .profile-badge-item:hover {
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    
+    .profile-badge-item:active {
+      transform: scale(0.97);
     }
     
     .profile-badge-item.locked {
@@ -782,6 +788,191 @@
     body[data-theme="light"] .profile-logged-out-btn.ghost {
       border-color: rgba(0, 0, 0, 0.15);
       color: inherit;
+    }
+    
+    /* ── Mobile Responsive Fixes ── */
+    @media (max-width: 480px) {
+      .page-main { padding-top: 64px; }
+      
+      .profile-page {
+        padding: 16px 14px 80px;
+      }
+      
+      /* Hero section mobile */
+      .profile-hero {
+        padding: 24px 16px 22px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+      }
+      
+      .profile-hero-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 1.8rem;
+        margin-bottom: 14px;
+      }
+      
+      .profile-hero-name {
+        font-size: 1.3rem;
+      }
+      
+      .profile-hero-username {
+        font-size: 0.85rem;
+      }
+      
+      .profile-hero-email {
+        font-size: 0.78rem;
+      }
+      
+      .profile-hero-badge {
+        padding: 5px 12px;
+        font-size: 0.72rem;
+      }
+      
+      /* Stats grid mobile — 2x2 always */
+      .profile-stats {
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      
+      .profile-stat-card {
+        padding: 14px 10px;
+        border-radius: 12px;
+      }
+      
+      .profile-stat-icon {
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+      }
+      
+      .profile-stat-value {
+        font-size: 1.1rem;
+      }
+      
+      .profile-stat-label {
+        font-size: 0.65rem;
+      }
+      
+      /* Bio section mobile */
+      .profile-bio-card {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+      }
+      
+      .profile-bio-title {
+        font-size: 0.7rem;
+        margin-bottom: 8px;
+      }
+      
+      .profile-bio-text {
+        font-size: 0.88rem;
+      }
+      
+      /* Info card mobile */
+      .profile-info-card {
+        padding: 6px 0;
+        border-radius: 12px;
+        margin-bottom: 18px;
+      }
+      
+      .profile-info-row {
+        padding: 12px 14px;
+      }
+      
+      .profile-info-label {
+        font-size: 0.82rem;
+      }
+      
+      .profile-info-value {
+        font-size: 0.82rem;
+      }
+      
+      /* Achievements section mobile */
+      .profile-achievements-card {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+      }
+      
+      .profile-achievements-header {
+        margin-bottom: 14px;
+      }
+      
+      .profile-achievements-title {
+        font-size: 0.92rem;
+        gap: 6px;
+      }
+      
+      .profile-achievements-count {
+        font-size: 0.72rem;
+        padding: 3px 8px;
+      }
+      
+      /* Badges grid mobile — ensure proper sizing */
+      .profile-achievements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+        gap: 8px;
+      }
+      
+      .profile-badge-item {
+        padding: 12px 6px;
+        border-radius: 10px;
+      }
+      
+      .profile-badge-icon {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+      }
+      
+      .profile-badge-name {
+        font-size: 0.6rem;
+      }
+      
+      /* Actions mobile */
+      .profile-actions {
+        gap: 10px;
+      }
+      
+      .profile-action-btn {
+        padding: 12px;
+        font-size: 0.82rem;
+        border-radius: 10px;
+      }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 360px) {
+      .profile-page {
+        padding: 12px 10px 80px;
+      }
+      
+      .profile-hero-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 1.6rem;
+      }
+      
+      .profile-hero-name {
+        font-size: 1.15rem;
+      }
+      
+      .profile-achievements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+        gap: 6px;
+      }
+      
+      .profile-badge-item {
+        padding: 10px 4px;
+      }
+      
+      .profile-badge-icon {
+        font-size: 1.3rem;
+      }
+      
+      .profile-badge-name {
+        font-size: 0.55rem;
+      }
     }
   </style>
 </head>
@@ -1362,21 +1553,55 @@ function renderProfilePageBadges(profile) {
   
   if (countEl) countEl.textContent = `${earnedCount}/${total}`;
   
-  let html = "";
+  grid.innerHTML = "";
   
   for (const badge of BADGE_DEFINITIONS) {
     const isEarned = earned.includes(badge.id);
     const earnedClass = isEarned ? "earned" : "locked";
     
-    html += `
-      <div class="profile-badge-item ${earnedClass}" title="${badge.desc}">
-        <span class="profile-badge-icon">${badge.icon}</span>
-        <span class="profile-badge-name">${badge.name}</span>
-      </div>
+    const item = document.createElement("div");
+    item.className = `profile-badge-item ${earnedClass}`;
+    item.title = badge.desc;
+    item.innerHTML = `
+      <span class="profile-badge-icon">${badge.icon}</span>
+      <span class="profile-badge-name">${badge.name}</span>
     `;
+    
+    // Make badge clickable — show info popup
+    item.addEventListener("click", () => showBadgeInfoPopup(badge, isEarned));
+    
+    grid.appendChild(item);
   }
+}
+
+// Show badge info popup (shared with slider panel)
+function showBadgeInfoPopup(badge, isEarned) {
+  // Remove existing popup
+  document.querySelector(".badge-info-popup")?.remove();
   
-  grid.innerHTML = html;
+  const popup = document.createElement("div");
+  popup.className = "badge-info-popup";
+  popup.innerHTML = `
+    <div class="badge-info-overlay"></div>
+    <div class="badge-info-card ${isEarned ? 'earned' : 'locked'}">
+      <div class="badge-info-icon">${badge.icon}</div>
+      <div class="badge-info-name">${badge.name}</div>
+      <div class="badge-info-desc">${badge.desc}</div>
+      <div class="badge-info-status">${isEarned ? '✓ Unlocked' : '🔒 Locked'}</div>
+      <button class="badge-info-close">Got it</button>
+    </div>
+  `;
+  
+  document.body.appendChild(popup);
+  requestAnimationFrame(() => popup.classList.add("open"));
+  
+  const close = () => {
+    popup.classList.remove("open");
+    setTimeout(() => popup.remove(), 200);
+  };
+  
+  popup.querySelector(".badge-info-overlay").addEventListener("click", close);
+  popup.querySelector(".badge-info-close").addEventListener("click", close);
 }
 
 // Time display is handled by script.js global interval
