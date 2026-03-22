@@ -3969,6 +3969,16 @@ body[data-theme="light"] .pp-badge-item.earned {
   padding: 0 2px;
 }
 
+/* Login hint for non-authenticated users */
+.pp-badges-login-hint {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.82rem;
+  opacity: 0.45;
+  padding: 24px 16px;
+  font-style: italic;
+}
+
 /* Make badge items clickable */
 .pp-badge-item {
   cursor: pointer;
