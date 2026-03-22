@@ -1947,16 +1947,29 @@ function updateAllTimeDisplays(totalMinutes) {
 
 // Live display: DB total + pending + current session (updates every second on ALL pages)
 function refreshTimeDisplay() {
-  if (!isTrackablePage() || !isUserLoggedIn) return;
+  // Always try to update displays, even on non-trackable pages
+  // (so profile page shows updated time)
   
-  const liveTotal = lastKnownDBTotal + pendingMinutes + getElapsedMins();
-  updateAllTimeDisplays(liveTotal);
-  
-  // Session indicator (dashboard only)
-  const sessionEl = document.getElementById("sessionIndicator");
-  if (sessionEl) {
-    const mins = Math.floor(getElapsedMins());
-    sessionEl.textContent = mins < 1 ? "Studying" : "Studying · " + mins + "m";
+  if (isTrackablePage() && isUserLoggedIn) {
+    // On trackable pages, add live elapsed time
+    const liveTotal = lastKnownDBTotal + pendingMinutes + getElapsedMins();
+    updateAllTimeDisplays(liveTotal);
+    
+    // Session indicator (dashboard only)
+    const sessionEl = document.getElementById("sessionIndicator");
+    if (sessionEl) {
+      const secs = Math.floor(getElapsedMins() * 60);
+      const mins = Math.floor(secs / 60);
+      const remSecs = secs % 60;
+      if (secs < 60) {
+        sessionEl.textContent = `Studying · ${secs}s`;
+      } else {
+        sessionEl.textContent = `Studying · ${mins}m ${remSecs}s`;
+      }
+    }
+  } else if (isUserLoggedIn) {
+    // On non-trackable pages (like profile.html), just show DB total
+    updateAllTimeDisplays(lastKnownDBTotal + pendingMinutes);
   }
 }
 
@@ -1964,6 +1977,15 @@ function refreshTimeDisplay() {
 async function initTimeTracking() {
   await checkUserLoggedIn();
   if (isUserLoggedIn && isTrackablePage()) {
+    // Restore any pending time from localStorage (saved on previous page unload)
+    const savedPending = parseFloat(localStorage.getItem("pendingStudyTime") || "0");
+    if (savedPending > 0) {
+      pendingMinutes = savedPending;
+      localStorage.removeItem("pendingStudyTime");
+      // Flush immediately to DB
+      flushTimeToDB();
+    }
+    
     // Fetch initial total from DB to set lastKnownDBTotal
     try {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1984,10 +2006,10 @@ async function initTimeTracking() {
 
 window.addEventListener("beforeunload", () => {
   accumulateTime();
-  // Use sendBeacon for reliable flush on unload
-  if (supabaseClient && pendingMinutes > 0) {
-    // Can't use async on beforeunload, so just accumulate
-    // The flush will happen on next page load or visibility change
+  // Save pending time to localStorage so it survives refresh
+  if (pendingMinutes > 0) {
+    const existing = parseFloat(localStorage.getItem("pendingStudyTime") || "0");
+    localStorage.setItem("pendingStudyTime", (existing + pendingMinutes).toString());
   }
 });
 
@@ -2003,12 +2025,12 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-// Periodic auto-save every 60 seconds on ALL trackable pages
+// Periodic auto-save every 5 seconds on ALL trackable pages
 setInterval(() => {
   if (!isTrackablePage() || !isUserLoggedIn) return;
   accumulateTime();
   flushTimeToDB();
-}, 60 * 1000);
+}, 5 * 1000);
 
 // Live time display every second on ALL pages
 setInterval(() => {
